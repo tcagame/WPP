@@ -155,6 +155,7 @@
     <ClCompile Include="Frame.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Past.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Framework2017\Framework2017.vcxproj">
@@ -165,6 +166,7 @@
     <ClInclude Include="define.h" />
     <ClInclude Include="Frame.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Past.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

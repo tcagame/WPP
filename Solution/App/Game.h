@@ -4,6 +4,7 @@
 
 PTR( Game );
 PTR( Frame );
+PTR( Past );
 
 class Game : public Task {
 public:
@@ -17,5 +18,6 @@ public:
 	void update( );
 private:
 	FramePtr _frame;
+	PastPtr _past;
 };
 
