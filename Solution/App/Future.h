@@ -9,5 +9,7 @@ public:
 public:
 	GRAPH getGraph( ) const;
 	void update( );
+private:
+	double _rot;
 };
 
