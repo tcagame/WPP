@@ -153,6 +153,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Frame.cpp" />
+    <ClCompile Include="Future.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Past.cpp" />
@@ -165,6 +166,7 @@
   <ItemGroup>
     <ClInclude Include="define.h" />
     <ClInclude Include="Frame.h" />
+    <ClInclude Include="Future.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Past.h" />
   </ItemGroup>

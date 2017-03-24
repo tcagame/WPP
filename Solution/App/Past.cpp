@@ -74,7 +74,7 @@ const char DATA[ DOT_NUM * DOT_NUM + 1 ] =
 Past::Past( ) {
 	DrawerPtr drawer = Drawer::getTask( );
 	drawer->createGraph( GRAPH_SCREEN_PAST, PAINTING_SIZE, PAINTING_SIZE );
-	drawer->loadGraph( GRAPH_DOT, "dot.png" );	Drawer::Transform trans( 0, 0 );
+	drawer->loadGraph( GRAPH_PAST_DOT, "past_dot.png" );	Drawer::Transform trans( 0, 0 );
 
 	for ( int i = 0; i < DOT_NUM * DOT_NUM; i++ ) {
 		if ( DATA[ i ] != '*' ) {
@@ -83,7 +83,7 @@ Past::Past( ) {
 		int x = i % DOT_NUM * DOT_SIZE;
 		int y = i / DOT_NUM * DOT_SIZE;
 		Drawer::Transform trans( x, y );
-		Drawer::Sprite sprite( trans, GRAPH_DOT );
+		Drawer::Sprite sprite( trans, GRAPH_PAST_DOT );
 		drawer->drawSpriteToGraph( GRAPH_SCREEN_PAST, sprite );
 	}
 }
