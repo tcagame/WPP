@@ -14,7 +14,7 @@ public:
 private:
 	void move( PastPtr past );
 	void fall( );
-	void setGraph( ) const;
+	void draw( ) const;
 private:
 	Vector _pos;
 	Vector _vec;

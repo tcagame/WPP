@@ -20,7 +20,7 @@ Player::~Player( ) {
 void Player::update( PastPtr past ) {
 	fall( );
 	move( past );
-	setGraph( );
+	draw( );
 	DrawerPtr drawer = Drawer::getTask( );
 	drawer->drawString( 10, 10, "プレイヤーの座標\nx:%d y:%d", (int)_pos.x, (int)_pos.y );
 }
@@ -47,7 +47,7 @@ GRAPH Player::getGraph( ) const {
 	return GRAPH_SCREEN_CHARACTER;
 }
 
-void Player::setGraph( ) const {
+void Player::draw( ) const {
 	int x = (int)_pos.x * DOT_SIZE - CHIP_SIZE / 2;
 	int y = (int)_pos.y * DOT_SIZE - CHIP_SIZE;
 	Drawer::Transform trans( x, y, 0, 0, CHIP_SIZE, CHIP_SIZE, x + CHIP_SIZE, y + CHIP_SIZE );
