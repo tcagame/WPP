@@ -2,9 +2,6 @@
 #include "define.h"
 #include "Drawer.h"
 
-const int DOT_SIZE = 16;
-const int DOT_NUM = PAINTING_SIZE / DOT_SIZE;
-
 const char DATA[ DOT_NUM * DOT_NUM + 1 ] = 
 "                                                                "
 "                                                                "
@@ -99,10 +96,8 @@ GRAPH Past::getGraph( ) const {
 	return GRAPH_SCREEN_PAST;
 }
 
-bool Past::isExistance( Vector check_pos ) const {
-	int x = (int)check_pos.x / DOT_SIZE;
-	int y = (int)check_pos.y / DOT_SIZE;
-	int idx = y * DOT_NUM + x;
+bool Past::isExistance( Vector pos ) const {
+	int idx = (int)( pos.y - 0.5 ) * DOT_NUM + (int)pos.x;
 	if ( DATA[ idx ] == '*' ) {
 		return true;
 	}

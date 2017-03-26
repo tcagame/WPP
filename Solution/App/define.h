@@ -1,6 +1,8 @@
 #pragma once
 
-const int PAINTING_SIZE = 1024;
+const int DOT_SIZE = 16;
+const int DOT_NUM = 64;
+const int PAINTING_SIZE = DOT_NUM * DOT_SIZE;
 
 enum GRAPH {
 	GRAPH_FRAME,

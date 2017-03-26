@@ -1,8 +1,6 @@
 #include "Drawer.h"
 #include "Future.h"
 
-const int DOT_SIZE = 16;
-const int DOT_NUM = PAINTING_SIZE / DOT_SIZE;
 const int ORIGINAL_NUM = 100;
 const double ROT_SPEED = 0.05;
 

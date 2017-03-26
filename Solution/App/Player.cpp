@@ -1,12 +1,11 @@
 #include "Player.h"
 #include "Application.h"
 #include "Past.h"
-#include "Frame.h"
 
 static const int CHIP_SIZE = 64;
-static const int GRAVITY = 1;
-static const int MAX_SPEED = 15;
-static const Vector START_POS( 512, 100 );
+static const double GRAVITY = 0.098;
+static const double MAX_SPEED = 1.0;
+static const Vector START_POS( 30, 12 );
 
 Player::Player( ) :
 _pos( START_POS ) {
@@ -22,6 +21,8 @@ void Player::update( PastPtr past ) {
 	fall( );
 	move( past );
 	setGraph( );
+	DrawerPtr drawer = Drawer::getTask( );
+	drawer->drawString( 10, 10, "プレイヤーの座標\nx:%d y:%d", (int)_pos.x, (int)_pos.y );
 }
 
 void Player::move( PastPtr past ) {
@@ -32,14 +33,14 @@ void Player::move( PastPtr past ) {
 		}
 	}
 
+	if ( _vec.getLength( ) > MAX_SPEED ) {
+		_vec = _vec.normalize( ) * MAX_SPEED;
+	}
 	_pos += _vec;
 }
 
 void Player::fall( ) {
 	_vec.y += GRAVITY;
-	if ( _vec.y > MAX_SPEED ) {
-		_vec.y = MAX_SPEED;
-	}
 }
 
 GRAPH Player::getGraph( ) const {
@@ -47,8 +48,8 @@ GRAPH Player::getGraph( ) const {
 }
 
 void Player::setGraph( ) const {
-	int x = (int)_pos.x - CHIP_SIZE / 2;
-	int y = (int)_pos.y - CHIP_SIZE;
+	int x = (int)_pos.x * DOT_SIZE - CHIP_SIZE / 2;
+	int y = (int)_pos.y * DOT_SIZE - CHIP_SIZE;
 	Drawer::Transform trans( x, y, 0, 0, CHIP_SIZE, CHIP_SIZE, x + CHIP_SIZE, y + CHIP_SIZE );
 	Drawer::Sprite sprite( trans, GRAPH_CHARACTER );
 
