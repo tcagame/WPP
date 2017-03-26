@@ -74,7 +74,7 @@ const char DATA[ DOT_NUM * DOT_NUM + 1 ] =
 Past::Past( ) {
 	DrawerPtr drawer = Drawer::getTask( );
 	drawer->createGraph( GRAPH_SCREEN_PAST, PAINTING_SIZE, PAINTING_SIZE );
-	drawer->loadGraph( GRAPH_PAST_DOT, "past_dot.png" );	Drawer::Transform trans( 0, 0 );
+	drawer->loadGraph( GRAPH_PAST_DOT, "past_dot.png" );
 
 	for ( int i = 0; i < DOT_NUM * DOT_NUM; i++ ) {
 		if ( DATA[ i ] != '*' ) {
@@ -97,4 +97,14 @@ void Past::update( ) {
 
 GRAPH Past::getGraph( ) const {
 	return GRAPH_SCREEN_PAST;
+}
+
+bool Past::isExistance( Vector check_pos ) const {
+	int x = (int)check_pos.x / DOT_SIZE;
+	int y = (int)check_pos.y / DOT_SIZE;
+	int idx = y * DOT_NUM + x;
+	if ( DATA[ idx ] == '*' ) {
+		return true;
+	}
+	return false;
 }

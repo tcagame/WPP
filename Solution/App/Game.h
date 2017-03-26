@@ -6,6 +6,7 @@ PTR( Game );
 PTR( Frame );
 PTR( Past );
 PTR( Future );
+PTR( Player );
 
 class Game : public Task {
 public:
@@ -21,5 +22,6 @@ private:
 	FramePtr _frame;
 	PastPtr _past;
 	FuturePtr _future;
+	PlayerPtr _player;
 };
 
