@@ -32,4 +32,13 @@ void Game::update( ) {
 	_frame->draw( _past->getGraph( ) );
 	_frame->draw( _player->getGraph( ) );
 	_frame->draw( _future->getGraph( ) );
+	drawGameOver( );
+}
+
+void Game::drawGameOver( ) {
+	if ( _player->isDead( ) ) {
+		DrawerPtr drawer = Drawer::getTask( );
+		ApplicationPtr app = Application::getInstance( );
+		drawer->drawString( app->getWindowWidth( ) / 2 - 60, app->getWindowHeight( ) / 2, "Game Over" );
+	}
 }

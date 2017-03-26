@@ -11,6 +11,7 @@ public:
 public:
 	void update( PastPtr past );
 	GRAPH getGraph( ) const;
+	bool isDead( ) const;
 private:
 	void move( PastPtr past );
 	void fall( );

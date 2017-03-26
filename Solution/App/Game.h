@@ -19,6 +19,8 @@ public:
 	void initialize( );
 	void update( );
 private:
+	void drawGameOver( );
+private:
 	FramePtr _frame;
 	PastPtr _past;
 	FuturePtr _future;

@@ -18,11 +18,14 @@ Player::~Player( ) {
 }
 
 void Player::update( PastPtr past ) {
+	DrawerPtr drawer = Drawer::getTask( );
+	drawer->drawString( 10, 10, "プレイヤーの座標\nx:%d y:%d", (int)_pos.x, (int)_pos.y );
+	if ( isDead( ) ) {
+		return;//死んだら処理しない
+	}
 	fall( );
 	move( past );
 	draw( );
-	DrawerPtr drawer = Drawer::getTask( );
-	drawer->drawString( 10, 10, "プレイヤーの座標\nx:%d y:%d", (int)_pos.x, (int)_pos.y );
 }
 
 void Player::move( PastPtr past ) {
@@ -56,4 +59,8 @@ void Player::draw( ) const {
 	DrawerPtr drawer = Drawer::getTask( );
 	drawer->createGraph( GRAPH_SCREEN_CHARACTER, PAINTING_SIZE, PAINTING_SIZE );
 	drawer->drawSpriteToGraph( GRAPH_SCREEN_CHARACTER, sprite );
+}
+
+bool Player::isDead( ) const {
+	return ( _pos.y - ( (double)CHIP_SIZE / DOT_SIZE ) > DOT_NUM );
 }
