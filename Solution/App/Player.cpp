@@ -3,7 +3,7 @@
 #include "Past.h"
 #include "device.h"
 
-static const int CHIP_SIZE = 64;
+static const int CHIP_SIZE = 128;
 static const double GRAVITY = 0.098;
 static const double MAX_SPEED = 1.0;
 static const Vector START_POS( 30, 12 );
@@ -48,15 +48,18 @@ void Player::update( ) {
 }
 
 void Player::actOnStanding( ) {
+	DevicePtr device = Device::getTask( );
+	char device_x = device->getDirX( );
+	_vec.x = device_x / 50;
+	if ( device_x < 0 ) {
+	}
 	move( );
-	
 	_pattern = 8;
 
 	if ( !isStanding( ) ) {
 		changeAction( ACTION_FLOATING );
 	}
 
-	DevicePtr device = Device::getTask( );
 	if ( device->getPush( ) & BUTTON_A ) {
 		changeAction( ACTION_HAMMER );
 	}
@@ -94,12 +97,15 @@ void Player::move( ) {
 	_vec.y += GRAVITY;
 
 	_standing = false;
-	if ( _vec.y > 0 ) {
+	if ( _vec.y > 0.01 ) {
 		Vector check_pos = _pos + _vec;
 		if ( _past->isExistance( check_pos ) ) {
 			_vec.y = 0.0;
-			_pos.y = ( int )check_pos.y - GRAVITY / 2;
 			_standing = true;
+			do {
+				_pos.y = ( int )check_pos.y - GRAVITY / 2;
+				check_pos.y = _pos.y;
+			} while ( _past->isExistance( check_pos ) );
 		}
 	}
 

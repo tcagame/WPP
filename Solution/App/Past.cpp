@@ -97,7 +97,7 @@ GRAPH Past::getGraph( ) const {
 }
 
 bool Past::isExistance( Vector pos ) const {
-	int idx = (int)( pos.y - 0.5 ) * DOT_NUM + (int)pos.x;
+	int idx = (int)( pos.y - 1 ) * DOT_NUM + (int)pos.x;
 	if ( DATA[ idx ] == '*' ) {
 		return true;
 	}
