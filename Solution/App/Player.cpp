@@ -1,14 +1,19 @@
 #include "Player.h"
 #include "Application.h"
 #include "Past.h"
+#include "Keyboard.h"
 
 static const int CHIP_SIZE = 64;
 static const double GRAVITY = 0.098;
 static const double MAX_SPEED = 1.0;
 static const Vector START_POS( 30, 12 );
+static const int HAMMER_ANIM_PATTERN = 8;
+static const int WAIT_ANIM_TIME = 10;
+static const double HAMMER_MOVE_SPEED_RATIO = 0.3;
 
 Player::Player( ) :
-_pos( START_POS ) {
+_pos( START_POS ),
+_state( STATE_WAIT ) {
 	DrawerPtr drawer = Drawer::getTask( );
 	drawer->loadGraph( GRAPH_CHARACTER, "character.png" );
 }
@@ -23,9 +28,34 @@ void Player::update( PastPtr past ) {
 	if ( isDead( ) ) {
 		return;//Ž€‚ñ‚¾‚çˆ—‚µ‚È‚¢
 	}
+	updateState( );
 	fall( );
+	action( );
 	move( past );
 	draw( );
+}
+
+void Player::updateState( ) {
+	KeyboardPtr keyboard = Keyboard::getTask( );
+	STATE state = STATE_WAIT;
+	if ( keyboard->isHoldKey( "SPACE" ) ) {
+		state = STATE_HAMMER;
+	}
+	if ( _state != state ) {
+		_state = state;
+		_action_count = 0;
+	}
+}
+
+void Player::action( ) {
+	switch ( _state ) {
+	case STATE_WAIT:
+		break;
+	case STATE_HAMMER:
+		hammer( );
+		break;
+	}
+	_action_count++;
 }
 
 void Player::move( PastPtr past ) {
@@ -36,14 +66,22 @@ void Player::move( PastPtr past ) {
 		}
 	}
 
-	if ( _vec.getLength( ) > MAX_SPEED ) {
-		_vec = _vec.normalize( ) * MAX_SPEED;
+	double max_speed = MAX_SPEED;
+	if ( _state == STATE_HAMMER ) {
+		max_speed *= HAMMER_MOVE_SPEED_RATIO;
+	}
+	if ( _vec.getLength( ) > max_speed ) {
+		_vec = _vec.normalize( ) * max_speed;
 	}
 	_pos += _vec;
 }
 
 void Player::fall( ) {
-	_vec.y += GRAVITY;
+	double ratio = 1.0;
+	if ( _state == STATE_HAMMER ) {
+		ratio = HAMMER_MOVE_SPEED_RATIO;
+	}
+	_vec.y += GRAVITY * ratio;
 }
 
 GRAPH Player::getGraph( ) const {
@@ -53,12 +91,26 @@ GRAPH Player::getGraph( ) const {
 void Player::draw( ) const {
 	int x = (int)_pos.x * DOT_SIZE - CHIP_SIZE / 2;
 	int y = (int)_pos.y * DOT_SIZE - CHIP_SIZE;
-	Drawer::Transform trans( x, y, 0, 0, CHIP_SIZE, CHIP_SIZE, x + CHIP_SIZE, y + CHIP_SIZE );
+	int cx = 0;
+	int cy = 0;
+	switch ( _state ) {
+	case STATE_WAIT:
+		break;
+	case STATE_HAMMER:
+		cx = _action_count / WAIT_ANIM_TIME % HAMMER_ANIM_PATTERN;
+		cy = 3;
+		break;
+	}
+	Drawer::Transform trans( x, y, cx * CHIP_SIZE, cy * CHIP_SIZE, CHIP_SIZE, CHIP_SIZE, x + CHIP_SIZE, y + CHIP_SIZE );
 	Drawer::Sprite sprite( trans, GRAPH_CHARACTER );
 
 	DrawerPtr drawer = Drawer::getTask( );
 	drawer->createGraph( GRAPH_SCREEN_CHARACTER, PAINTING_SIZE, PAINTING_SIZE );
 	drawer->drawSpriteToGraph( GRAPH_SCREEN_CHARACTER, sprite );
+}
+
+void Player::hammer( ) {
+
 }
 
 bool Player::isDead( ) const {
