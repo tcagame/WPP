@@ -10,10 +10,12 @@ static const Vector START_POS( 30, 12 );
 static const int HAMMER_ANIM_PATTERN = 8;
 static const int WAIT_ANIM_TIME = 10;
 static const double HAMMER_MOVE_SPEED_RATIO = 0.3;
+static const int DEAD_LINE = DOT_NUM + 4;
 
-Player::Player( ) :
+Player::Player( PastPtr past ) :
 _pos( START_POS ),
-_state( STATE_WAIT ) {
+_state( STATE_WAIT ),
+_past( past ) {
 	DrawerPtr drawer = Drawer::getTask( );
 	drawer->loadGraph( GRAPH_CHARACTER, "character.png" );
 }
@@ -22,17 +24,15 @@ _state( STATE_WAIT ) {
 Player::~Player( ) {
 }
 
-void Player::update( PastPtr past ) {
+void Player::update( ) {
+	fall( );
+	updateState( );
+	move( );
+	draw( );
+	_action_count++;
+
 	DrawerPtr drawer = Drawer::getTask( );
 	drawer->drawString( 10, 10, "プレイヤーの座標\nx:%d y:%d", (int)_pos.x, (int)_pos.y );
-	if ( isDead( ) ) {
-		return;//死んだら処理しない
-	}
-	updateState( );
-	fall( );
-	action( );
-	move( past );
-	draw( );
 }
 
 void Player::updateState( ) {
@@ -47,20 +47,10 @@ void Player::updateState( ) {
 	}
 }
 
-void Player::action( ) {
-	switch ( _state ) {
-	case STATE_WAIT:
-		break;
-	case STATE_HAMMER:
-		break;
-	}
-	_action_count++;
-}
-
-void Player::move( PastPtr past ) {
+void Player::move( ) {
 	if ( _vec.y > 0 ) {
 		Vector check_pos = _pos + _vec;
-		if ( past->isExistance( check_pos ) ) {
+		if ( _past->isExistance( check_pos ) ) {
 			_vec.y = 0.0;
 		}
 	}
@@ -90,10 +80,12 @@ GRAPH Player::getGraph( ) const {
 void Player::draw( ) const {
 	int x = (int)_pos.x * DOT_SIZE - CHIP_SIZE / 2;
 	int y = (int)_pos.y * DOT_SIZE - CHIP_SIZE;
-	int cx = 0;
-	int cy = 0;
+	int cx = -1;
+	int cy = -1;
 	switch ( _state ) {
 	case STATE_WAIT:
+		cx = 0;
+		cy = 0;
 		break;
 	case STATE_HAMMER:
 		cx = _action_count / WAIT_ANIM_TIME % HAMMER_ANIM_PATTERN;
@@ -109,5 +101,5 @@ void Player::draw( ) const {
 }
 
 bool Player::isDead( ) const {
-	return ( _pos.y - ( (double)CHIP_SIZE / DOT_SIZE ) > DOT_NUM );
+	return ( _pos.y > DEAD_LINE );
 }

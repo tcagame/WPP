@@ -6,10 +6,10 @@ PTR( Past );
 
 class Player {
 public:
-	Player( );
+	Player( PastPtr past );
 	virtual ~Player( );
 public:
-	void update( PastPtr past );
+	void update( );
 	GRAPH getGraph( ) const;
 	bool isDead( ) const;
 private:
@@ -19,8 +19,7 @@ private:
 		MAX_STATE
 	};
 private:
-	void action( );
-	void move( PastPtr past );
+	void move( );
 	void fall( );
 	void draw( ) const;
 	void updateState( );
@@ -29,4 +28,5 @@ private:
 	Vector _vec;
 	STATE _state;
 	int _action_count;
+	PastPtr _past;
 };

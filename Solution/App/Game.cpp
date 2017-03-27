@@ -22,13 +22,13 @@ void Game::initialize( ) {
 	_frame = FramePtr( new Frame );
 	_past = PastPtr( new Past );
 	_future = FuturePtr( new Future );
-	_player = PlayerPtr( new Player );
+	_player = PlayerPtr( new Player( _past ) );
 }
 
 void Game::update( ) {
 	_past->update( );
 	_future->update( );
-	_player->update( _past );
+	_player->update( );
 	_frame->draw( _past->getGraph( ) );
 	_frame->draw( _player->getGraph( ) );
 	_frame->draw( _future->getGraph( ) );
