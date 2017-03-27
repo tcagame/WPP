@@ -13,20 +13,26 @@ public:
 	GRAPH getGraph( ) const;
 	bool isDead( ) const;
 private:
-	enum STATE {
-		STATE_WAIT,
-		STATE_HAMMER,
-		MAX_STATE
+	enum ACTION {
+		ACTION_STANDING,
+		ACTION_FLOATING,
+		ACTION_HAMMER,
+		MAX_ACTION
 	};
 private:
 	void move( );
-	void fall( );
 	void draw( ) const;
-	void updateState( );
+	void actOnStanding( );
+	void actOnFloating( );
+	void actOnHammer( );
+	bool isStanding( ) const;
+	void changeAction( ACTION action );
 private:
 	Vector _pos;
 	Vector _vec;
-	STATE _state;
-	int _action_count;
+	ACTION _action;
 	PastPtr _past;
+	int _pattern;
+	int _action_count;
+	bool _standing;
 };

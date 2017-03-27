@@ -7,15 +7,18 @@ static const int CHIP_SIZE = 64;
 static const double GRAVITY = 0.098;
 static const double MAX_SPEED = 1.0;
 static const Vector START_POS( 30, 12 );
-static const int HAMMER_ANIM_PATTERN = 8;
+static const int PATTERN_NUM = 8;
 static const int WAIT_ANIM_TIME = 10;
 static const double HAMMER_MOVE_SPEED_RATIO = 0.3;
 static const int DEAD_LINE = DOT_NUM + 4;
+static const int HAMMER_PATTERN_NUM = 8;
+static const int HAMMER_COUNT = HAMMER_PATTERN_NUM * WAIT_ANIM_TIME;
 
 Player::Player( PastPtr past ) :
 _pos( START_POS ),
-_state( STATE_WAIT ),
-_past( past ) {
+_action( ACTION_STANDING ),
+_past( past ),
+_pattern( 0 ) {
 	DrawerPtr drawer = Drawer::getTask( );
 	drawer->loadGraph( GRAPH_CHARACTER, "character.png" );
 }
@@ -25,52 +28,85 @@ Player::~Player( ) {
 }
 
 void Player::update( ) {
-	fall( );
-	updateState( );
-	move( );
-	draw( );
 	_action_count++;
 
+	switch ( _action ) {
+	case ACTION_STANDING:
+		actOnStanding( );
+		break;
+	case ACTION_FLOATING:
+		actOnFloating( );
+		break;
+	case ACTION_HAMMER:
+		actOnHammer( );
+		break;
+	}
+
+	draw( );
 	DrawerPtr drawer = Drawer::getTask( );
 	drawer->drawString( 10, 10, "プレイヤーの座標\nx:%d y:%d", (int)_pos.x, (int)_pos.y );
 }
 
-void Player::updateState( ) {
-	DevicePtr device = Device::getTask( );
-	STATE state = STATE_WAIT;
-	if ( device->getButton( ) & BUTTON_A ) {
-		state = STATE_HAMMER;
+void Player::actOnStanding( ) {
+	move( );
+	
+	_pattern = 8;
+
+	if ( !isStanding( ) ) {
+		changeAction( ACTION_FLOATING );
 	}
-	if ( _state != state ) {
-		_state = state;
-		_action_count = 0;
+
+	DevicePtr device = Device::getTask( );
+	if ( device->getPush( ) & BUTTON_A ) {
+		changeAction( ACTION_HAMMER );
 	}
 }
 
+void Player::actOnFloating( ) {
+	move( );
+
+	_pattern = 0;
+
+	if ( isStanding( ) ) {
+		changeAction( ACTION_STANDING );
+	}
+
+	DevicePtr device = Device::getTask( );
+	if ( device->getPush( ) & BUTTON_A ) {
+		_action = ACTION_HAMMER;
+	}
+}
+
+void Player::actOnHammer( ) {
+
+	_pattern = 24 + _action_count / ( HAMMER_COUNT / HAMMER_PATTERN_NUM );
+	if ( _action_count > HAMMER_COUNT ) {
+		_pattern = 8;
+		changeAction( ACTION_STANDING );
+	}
+}
+
+bool Player::isStanding( ) const {
+	return _standing;
+}
+
 void Player::move( ) {
+	_vec.y += GRAVITY;
+
+	_standing = false;
 	if ( _vec.y > 0 ) {
 		Vector check_pos = _pos + _vec;
 		if ( _past->isExistance( check_pos ) ) {
 			_vec.y = 0.0;
+			_pos.y = ( int )check_pos.y - GRAVITY / 2;
+			_standing = true;
 		}
 	}
 
-	double max_speed = MAX_SPEED;
-	if ( _state == STATE_HAMMER ) {
-		max_speed *= HAMMER_MOVE_SPEED_RATIO;
-	}
-	if ( _vec.getLength( ) > max_speed ) {
-		_vec = _vec.normalize( ) * max_speed;
+	if ( _vec.getLength( ) > MAX_SPEED ) {
+		_vec = _vec.normalize( ) * MAX_SPEED;
 	}
 	_pos += _vec;
-}
-
-void Player::fall( ) {
-	double ratio = 1.0;
-	if ( _state == STATE_HAMMER ) {
-		ratio = HAMMER_MOVE_SPEED_RATIO;
-	}
-	_vec.y += GRAVITY * ratio;
 }
 
 GRAPH Player::getGraph( ) const {
@@ -80,19 +116,9 @@ GRAPH Player::getGraph( ) const {
 void Player::draw( ) const {
 	int x = (int)_pos.x * DOT_SIZE - CHIP_SIZE / 2;
 	int y = (int)_pos.y * DOT_SIZE - CHIP_SIZE;
-	int cx = -1;
-	int cy = -1;
-	switch ( _state ) {
-	case STATE_WAIT:
-		cx = 0;
-		cy = 0;
-		break;
-	case STATE_HAMMER:
-		cx = _action_count / WAIT_ANIM_TIME % HAMMER_ANIM_PATTERN;
-		cy = 3;
-		break;
-	}
-	Drawer::Transform trans( x, y, cx * CHIP_SIZE, cy * CHIP_SIZE, CHIP_SIZE, CHIP_SIZE, x + CHIP_SIZE, y + CHIP_SIZE );
+	int tx = _pattern % PATTERN_NUM * CHIP_SIZE;
+	int ty = _pattern / PATTERN_NUM * CHIP_SIZE;
+	Drawer::Transform trans( x, y, tx, ty, CHIP_SIZE, CHIP_SIZE );
 	Drawer::Sprite sprite( trans, GRAPH_CHARACTER );
 
 	DrawerPtr drawer = Drawer::getTask( );
@@ -102,4 +128,9 @@ void Player::draw( ) const {
 
 bool Player::isDead( ) const {
 	return ( _pos.y > DEAD_LINE );
+}
+
+void Player::changeAction( ACTION action ) {
+	_action = action;
+	_action_count = 0;
 }
