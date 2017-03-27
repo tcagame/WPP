@@ -1,7 +1,7 @@
 #include "Player.h"
 #include "Application.h"
 #include "Past.h"
-#include "Keyboard.h"
+#include "device.h"
 
 static const int CHIP_SIZE = 64;
 static const double GRAVITY = 0.098;
@@ -36,9 +36,9 @@ void Player::update( PastPtr past ) {
 }
 
 void Player::updateState( ) {
-	KeyboardPtr keyboard = Keyboard::getTask( );
+	DevicePtr device = Device::getTask( );
 	STATE state = STATE_WAIT;
-	if ( keyboard->isHoldKey( "SPACE" ) ) {
+	if ( device->getButton( ) & BUTTON_A ) {
 		state = STATE_HAMMER;
 	}
 	if ( _state != state ) {
@@ -52,7 +52,6 @@ void Player::action( ) {
 	case STATE_WAIT:
 		break;
 	case STATE_HAMMER:
-		hammer( );
 		break;
 	}
 	_action_count++;
@@ -107,10 +106,6 @@ void Player::draw( ) const {
 	DrawerPtr drawer = Drawer::getTask( );
 	drawer->createGraph( GRAPH_SCREEN_CHARACTER, PAINTING_SIZE, PAINTING_SIZE );
 	drawer->drawSpriteToGraph( GRAPH_SCREEN_CHARACTER, sprite );
-}
-
-void Player::hammer( ) {
-
 }
 
 bool Player::isDead( ) const {

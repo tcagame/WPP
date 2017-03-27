@@ -23,7 +23,6 @@ private:
 	void move( PastPtr past );
 	void fall( );
 	void draw( ) const;
-	void hammer( );
 	void updateState( );
 private:
 	Vector _pos;
