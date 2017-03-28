@@ -1,6 +1,8 @@
 #pragma once
 #include "define.h"
 
+PTR( Item );
+
 class Future
 {
 public:
@@ -10,6 +12,9 @@ public:
 	GRAPH getGraph( ) const;
 	void update( );
 private:
+	void load( );
+private:
 	double _rot;
+	ItemPtr _item;
 };
 
