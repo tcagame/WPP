@@ -39,7 +39,7 @@ const char DATA[ DOT_NUM * DOT_NUM + 1 ] =
 "                                                                "
 "                                                                "
 "                                                                "
-"                                                                "
+" ***************                                                "
 "                                                                "
 "                                                                "
 "                                                                "

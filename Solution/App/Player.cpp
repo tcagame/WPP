@@ -13,6 +13,8 @@ static const double HAMMER_MOVE_SPEED_RATIO = 0.3;
 static const int DEAD_LINE = DOT_NUM + 4;
 static const int HAMMER_PATTERN_NUM = 8;
 static const int HAMMER_COUNT = HAMMER_PATTERN_NUM * WAIT_ANIM_TIME;
+static const double JUMP_POW = MAX_SPEED;
+static const double HEIGHT = 5.0;
 
 Player::Player( PastPtr past ) :
 _pos( START_POS ),
@@ -63,6 +65,9 @@ void Player::actOnStanding( ) {
 	if ( device->getPush( ) & BUTTON_A ) {
 		changeAction( ACTION_HAMMER );
 	}
+	if ( device->getPush( ) & BUTTON_C ) {
+		_vec.y -= JUMP_POW;
+	}
 }
 
 void Player::actOnFloating( ) {
@@ -97,15 +102,22 @@ void Player::move( ) {
 	_vec.y += GRAVITY;
 
 	_standing = false;
-	if ( _vec.y > 0.01 ) {
+	double add_y = 0.0;
+	double adjust_y = GRAVITY / 2;
+	if ( _vec.y < -0.01 ) {
+		add_y = HEIGHT;
+		adjust_y = -HEIGHT;
+	}
+	if ( fabs( _vec.y ) > 0.01 ) {
 		Vector check_pos = _pos + _vec;
+		check_pos.y -= add_y;
 		if ( _past->isExistance( check_pos ) ) {
 			_vec.y = 0.0;
 			_standing = true;
 			do {
-				_pos.y = ( int )check_pos.y - GRAVITY / 2;
+				_pos.y = ( int )check_pos.y - adjust_y;
 				check_pos.y = _pos.y;
-			} while ( _past->isExistance( check_pos ) );
+			} while ( _past->isExistance( check_pos ) && adjust_y > 0.01 );
 		}
 	}
 
