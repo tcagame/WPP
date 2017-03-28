@@ -13,7 +13,7 @@ static const double HAMMER_MOVE_SPEED_RATIO = 0.3;
 static const int DEAD_LINE = DOT_NUM + 4;
 static const int HAMMER_PATTERN_NUM = 8;
 static const int HAMMER_COUNT = HAMMER_PATTERN_NUM * WAIT_ANIM_TIME;
-static const double JUMP_POW = MAX_SPEED;
+static const double JUMP_POW = 1.0;
 static const double HEIGHT = 5.0;
 
 Player::Player( PastPtr past ) :
@@ -106,7 +106,7 @@ void Player::move( ) {
 	double adjust_y = GRAVITY / 2;
 	if ( _vec.y < -0.01 ) {
 		add_y = HEIGHT;
-		adjust_y = -HEIGHT;
+		adjust_y = -HEIGHT - 1;
 	}
 	if ( fabs( _vec.y ) > 0.01 ) {
 		Vector check_pos = _pos + _vec;
@@ -132,8 +132,8 @@ GRAPH Player::getGraph( ) const {
 }
 
 void Player::draw( ) const {
-	int x = (int)_pos.x * DOT_SIZE - CHIP_SIZE / 2;
-	int y = (int)_pos.y * DOT_SIZE - CHIP_SIZE;
+	int x = (int)( _pos.x * DOT_SIZE - CHIP_SIZE / 2 );
+	int y = (int)( _pos.y * DOT_SIZE - CHIP_SIZE );
 	int tx = _pattern % PATTERN_NUM * CHIP_SIZE;
 	int ty = _pattern / PATTERN_NUM * CHIP_SIZE;
 	Drawer::Transform trans( x, y, tx, ty, CHIP_SIZE, CHIP_SIZE );
