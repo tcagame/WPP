@@ -3,7 +3,7 @@
 #include "Item.h"
 #include "define.h"
 
-const double ROT_SPEED = 0.05;
+const double ROT_SPEED = 0.025;
 const int SHEET_NUM = 6;
 
 const char DATA[ SHEET_NUM ][ ORIGINAL_NUM * ORIGINAL_NUM + 1 ] = {
@@ -36,37 +36,37 @@ const char DATA[ SHEET_NUM ][ ORIGINAL_NUM * ORIGINAL_NUM + 1 ] = {
 "                                                                                                    "
 "                                                                                                    "
 "                                                                                                    "
-"                                 **********************************************************         "
 "                                                                                                    "
 "                                                                                                    "
 "                                                                                                    "
-"                 **************                                                                     "
-"                 **************                                                                     "
-"                 **************                                                                     "
-"                 **************               $                                                     "
-"                 **************                                                                     "
-"                 **************                                                                     "
-"                 **************                                                                     "
-"                 **************                                                                     "
-"                 **************                                                                     "
-"                 **************                                                                     "
-"                 **************                                                                     "
-"                 **************               *                                                     "
-"                 **************               *                                                     "
-"                 **************               *                                                     "
-"                 **************               *                                                     "
-"                 **************              ***                                                    "
-"                 **************             *****                                                   "
-"                 **************           *********                                                 "
-"                 **************          ***********                                                "
-"                 **************         *************                                               "
-"***                                    ***** *** *****                                              "
-" ***                                   **** * * * ****                                              "
-"  ***                                  **** * * * ****                                              "
-"                                       ** ** *** ** **                                              "
-"                                       **  *******  **                                              "
-"                                        **         **                                               "
-"                                         ***********                                                "
+"                                                                                                    "
+"                                                                                                    "
+"                                                                                                    "
+"                                                                                                    "
+"                 *********************************************                                      "
+"                 **********************************************                                     "
+"                 **************************************************                                 "
+"                 ****************************************************                               "
+"                 *******************************************************                            "
+"                 *************************************                                              "
+"                 ***********************************                                                "
+"                 ******************************************                                         "
+"                 *************************************                                              "
+"                 **********************************                                                 "
+"                 **********************************************                                     "
+"                 ****************************************                                           "
+"                 ****************************************                                           "
+"                 ***************************************                                            "
+"                 ****************************************                                           "
+"                 ******************************************                                         "
+"                 *****************************************                                          "
+"                                                                                                    "
+"                                                                                                    "
+"                                                                                                    "
+"                                                                                                    "
+"                                                                                                    "
+"                                                                                                    "
+"                                                                                                    "
 "                                                                                                    "
 "                                                                                                    "
 "                                                                                                    "
@@ -649,30 +649,50 @@ GRAPH Future::getGraph( ) const {
 }
 
 void Future::update( ) {
-	//_rot += ROT_SPEED;
+	_rot += ROT_SPEED;
+	Matrix mat = Matrix::makeTransformRotation( Vector( 0, 0, 1 ), _rot );
+
+	char tmp[ ORIGINAL_NUM * ORIGINAL_NUM ] = { 0 };
+	for ( int i = 0; i < ORIGINAL_NUM; i++ ) {
+		for ( int j = 0; j < ORIGINAL_NUM; j++ ) {
+			Vector vec( i, j );
+
+			// 中心からのベクトルにする
+			vec = vec - Vector( ORIGINAL_NUM / 2, ORIGINAL_NUM / 2 );
+			// 回転させる
+			vec = mat.multiply( vec );
+			// 原点からのベクトルに戻す
+			vec = vec + Vector( ORIGINAL_NUM / 2, ORIGINAL_NUM / 2 );
+
+			int xx = ( int )vec.x;
+			int yy = ( int )vec.y;
+
+			char ch = ' ';
+			if ( xx >= 0 && xx < ORIGINAL_NUM &&
+				 yy >= 0 && yy < ORIGINAL_NUM ) {
+				int data_idx = xx + yy * ORIGINAL_NUM;
+				ch = _data[ data_idx ];
+			}
+
+			int tmp_idx = i + j * ORIGINAL_NUM;
+			tmp[ tmp_idx ] = ch;
+		}
+	}	
+
+	// 描画
 	DrawerPtr drawer = Drawer::getTask( );
-	
 	drawer->clearToGraph( GRAPH_SCREEN_FUTURE );
 	if ( _sheet >= SHEET_NUM ) {
 		return;
 	}
-
 	for ( int i = 0; i < DOT_NUM; i++ ) {
 		for ( int j = 0; j < DOT_NUM; j++ ) {
-			//　無回転
-			Vector vec(
-				i - DOT_NUM / 2,
-				j - DOT_NUM / 2 );
-			Matrix mat = Matrix::makeTransformRotation( Vector( 0, 0, 1 ), _rot );
-			vec = mat.multiply( vec );
-			int xx = ( int )vec.x + ORIGINAL_NUM / 2;
-			int yy = ( int )vec.y + ORIGINAL_NUM / 2;
-			int idx = xx + yy * ORIGINAL_NUM;
-
+			int xx = i + ( ORIGINAL_NUM - DOT_NUM ) / 2;
+			int yy = j + ( ORIGINAL_NUM - DOT_NUM ) / 2;
 			unsigned char flg = 0;
 			for ( int k = 0; k < 4; k++ ) {
 				int idx = ( xx + k % 2 ) + ( yy + k / 2 ) * ORIGINAL_NUM;
-				if ( _data[ idx ] != '*' ) {
+				if ( tmp[ idx ] != '*' ) {
 					continue;
 				}
 				flg |= 1 << k;
@@ -685,7 +705,7 @@ void Future::update( ) {
 			drawer->drawSpriteToGraph( GRAPH_SCREEN_FUTURE, sprite );
 		}
 	}
-
+	
 	if ( _item ) {
 		Matrix mat = Matrix::makeTransformRotation( Vector( 0, 0, -1 ), _rot );
 		_item->update( mat, ORIGINAL_NUM );
