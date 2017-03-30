@@ -40,26 +40,26 @@ const char DATA[ SHEET_NUM ][ ORIGINAL_NUM * ORIGINAL_NUM + 1 ] = {
 "                                                                                                    "
 "                                                                                                    "
 "                                                                                                    "
-"                 **************                                                                     "
-"                 **************                                                                     "
-"                 **************                                                                     "
-"                 **************               $                                                     "
-"                 **************                                                                     "
-"                 **************                                                                     "
-"                 **************                                                                     "
-"                 **************                                                                     "
-"                 **************                                                                     "
-"                 **************                                                                     "
-"                 **************                                                                     "
-"                 **************               *                                                     "
-"                 **************               *                                                     "
-"                 **************               *                                                     "
-"                 **************               *                                                     "
-"                 **************              ***                                                    "
-"                 **************             *****                                                   "
-"                 **************           *********                                                 "
-"                 **************          ***********                                                "
-"                 **************         *************                                               "
+"                                                                                                    "
+"                                                                                                    "
+"                                                                                                    "
+"                                              $                                                     "
+"                                                                                                    "
+"                                                                                                    "
+"                                                                                                    "
+"                                                                                                    "
+"                                                                                                    "
+"                                                                                                    "
+"                                                                                                    "
+"                                              *                                                     "
+"                                              *                                                     "
+"                                              *                                                     "
+"                                              *                                                     "
+"                                             ***                                                    "
+"                                            *****                                                   "
+"                                          *********                                                 "
+"                                         ***********                                                "
+"                                        *************                                               "
 "***                                    ***** *** *****                                              "
 " ***                                   **** * * * ****                                              "
 "  ***                                  **** * * * ****                                              "
@@ -649,7 +649,7 @@ GRAPH Future::getGraph( ) const {
 }
 
 void Future::update( ) {
-	//_rot += ROT_SPEED;
+	_rot += ROT_SPEED;
 	DrawerPtr drawer = Drawer::getTask( );
 	
 	drawer->clearToGraph( GRAPH_SCREEN_FUTURE );
@@ -714,8 +714,9 @@ void Future::change( ) {
 	load( );
 }
 
-void Future::erase( Vector pos, int radius ) {
+void Future::erase( Vector pos, double radius ) {
 	pos.y -= radius;
+	radius += 1;
 	//絵画回転後　posの位置の 半径分データをけす
 	//　無回転
 	Vector vec(
@@ -725,6 +726,30 @@ void Future::erase( Vector pos, int radius ) {
 	vec = mat.multiply( vec );
 	int xx = ( int )vec.x + ORIGINAL_NUM / 2;
 	int yy = ( int )vec.y + ORIGINAL_NUM / 2;
-	int idx = xx + yy * ORIGINAL_NUM;
-	_data[ idx ] = ' ';
+	for ( int i = 0; i < radius; i++ ) {
+		double height = (int)( sqrt( radius * radius - i * i ) );
+		for ( int j = 0; j < height; j++ ) {
+			//右下
+			int x = xx + i;
+			int y = yy + j;
+			int idx = x + y * ORIGINAL_NUM;
+			_data[ idx ] = ' ';
+
+			//右上
+			y = yy - j;
+			idx = x + y * ORIGINAL_NUM;
+			_data[ idx ] = ' ';
+
+			//左上
+			x = xx - i;
+			idx = x + y * ORIGINAL_NUM;
+			_data[ idx ] = ' ';
+
+			//左下
+			x = xx - i;
+			y = yy + j;
+			idx = x + y * ORIGINAL_NUM;
+			_data[ idx ] = ' ';
+		}
+	}
 }

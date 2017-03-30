@@ -14,7 +14,7 @@ public:
 	GRAPH getGraph( ) const;
 	void update( );
 	void change( );
-	void erase( Vector pos, int radius ); 
+	void erase( Vector pos, double radius ); 
 private:
 	void load( );
 private:
