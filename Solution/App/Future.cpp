@@ -1,6 +1,7 @@
 #include "Drawer.h"
 #include "Future.h"
 #include "Item.h"
+#include "define.h"
 
 const int ORIGINAL_NUM = 100;
 const double ROT_SPEED = 0.05;
@@ -646,8 +647,7 @@ GRAPH Future::getGraph( ) const {
 }
 
 void Future::update( ) {
-	_rot += ROT_SPEED;
-	
+	//_rot += ROT_SPEED;
 	DrawerPtr drawer = Drawer::getTask( );
 	
 	drawer->clearToGraph( GRAPH_SCREEN_FUTURE );
@@ -665,14 +665,19 @@ void Future::update( ) {
 			vec = mat.multiply( vec );
 			int xx = ( int )vec.x + ORIGINAL_NUM / 2;
 			int yy = ( int )vec.y + ORIGINAL_NUM / 2;
-			int idx = xx + yy * ORIGINAL_NUM;
-			if ( DATA[ _sheet ][ idx ] != '*' ) {
-				continue;
-			}
 
+			unsigned char flg = 0;
+			for ( int k = 0; k < 4; k++ ) {
+				int idx = ( xx + k % 2 ) + ( yy + k / 2 ) * ORIGINAL_NUM;
+				if ( DATA[ _sheet ][ idx ] != '*' ) {
+					continue;
+				}
+				flg |= 1 << k;
+			}
+			
 			int x = i * DOT_SIZE;
 			int y = j * DOT_SIZE;
-			Drawer::Transform trans( x, y, 48, 48, 16, 16 );
+			Drawer::Transform trans( x, y, ( flg % 4 ) * DOT_SIZE, ( flg / 4 ) * DOT_SIZE, DOT_SIZE, DOT_SIZE );
 			Drawer::Sprite sprite( trans, GRAPH_FUTURE_DOT );
 			drawer->drawSpriteToGraph( GRAPH_SCREEN_FUTURE, sprite );
 		}
