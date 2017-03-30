@@ -98,6 +98,7 @@ void Player::actOnHammer( ) {
 	if ( _action_count > HAMMER_COUNT ) {
 		_pattern = 8;
 		_hammer_count++;
+		_future->erase( _pos, HEIGHT / 2 );
 		if ( _hammer_count >= MAX_HIT ) {
 			_future->change( );
 			_hammer_count = 0;
