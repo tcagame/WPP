@@ -9,7 +9,7 @@ static const double GRAVITY = 0.098;
 static const double MAX_SPEED = 1.0;
 static const Vector START_POS( 30, 12 );
 static const int PATTERN_NUM = 8;
-static const int WAIT_ANIM_TIME = 1;
+static const int WAIT_ANIM_TIME = 4;
 static const double HAMMER_MOVE_SPEED_RATIO = 0.3;
 static const int DEAD_LINE = DOT_NUM + 4;
 static const int HAMMER_PATTERN_NUM = 8;
@@ -99,8 +99,8 @@ void Player::actOnHammer( ) {
 		_pattern = 8;
 		_hammer_count++;
 		_future->erase( _pos, HEIGHT / 2 );
-			_future->change( );
 		if ( _hammer_count >= MAX_HIT ) {
+			_future->change( );
 			_hammer_count = 0;
 		}
 		changeAction( ACTION_STANDING );
@@ -128,8 +128,9 @@ void Player::move( ) {
 		_vec.y = 0.0;
 		_standing = true;
 		do {
+			//‚Q‰ñ–ÚˆÈ~‚Ìadjust‚Ì’l‚ª‚¨‚©‚µ‚¢
 			_pos.y = ( int )check_pos.y - adjust_y;
-			check_pos.y = _pos.y;
+			check_pos.y = _pos.y - add_y;
 		} while ( _past->isExistance( check_pos ) && adjust_y > 0.01 );
 	}
 
@@ -144,6 +145,11 @@ GRAPH Player::getGraph( ) const {
 }
 
 void Player::draw( ) const {
+	if ( _pos.x < 0 || _pos.y < 0 ) {
+		DrawerPtr drawer = Drawer::getTask( );
+		drawer->createGraph( GRAPH_SCREEN_CHARACTER, PAINTING_SIZE, PAINTING_SIZE );	
+		return;
+	}
 	int x = (int)( _pos.x * DOT_SIZE - CHIP_SIZE / 2 );
 	int y = (int)( _pos.y * DOT_SIZE - CHIP_SIZE );
 	int tx = _pattern % PATTERN_NUM * CHIP_SIZE;
