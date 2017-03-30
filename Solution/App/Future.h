@@ -2,13 +2,14 @@
 #include "define.h"
 
 PTR( Item );
+PTR( Past );
 
 const int ORIGINAL_NUM = 100;
 
 class Future
 {
 public:
-	Future( );
+	Future( PastPtr past );
 	virtual ~Future( );
 public:
 	GRAPH getGraph( ) const;
@@ -22,5 +23,6 @@ private:
 	ItemPtr _item;
 	int _sheet;
 	char _data[ ORIGINAL_NUM * ORIGINAL_NUM + 1 ];
+	PastPtr _past;
 };
 
