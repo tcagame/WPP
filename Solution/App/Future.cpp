@@ -672,7 +672,7 @@ void Future::update( ) {
 
 			int x = i * DOT_SIZE;
 			int y = j * DOT_SIZE;
-			Drawer::Transform trans( x, y );
+			Drawer::Transform trans( x, y, 48, 48, 16, 16 );
 			Drawer::Sprite sprite( trans, GRAPH_FUTURE_DOT );
 			drawer->drawSpriteToGraph( GRAPH_SCREEN_FUTURE, sprite );
 		}
