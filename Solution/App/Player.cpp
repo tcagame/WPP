@@ -108,17 +108,16 @@ void Player::move( ) {
 		add_y = HEIGHT;
 		adjust_y = -HEIGHT - 1;
 	}
-	if ( fabs( _vec.y ) > 0.01 ) {
-		Vector check_pos = _pos + _vec;
-		check_pos.y -= add_y;
-		if ( _past->isExistance( check_pos ) ) {
-			_vec.y = 0.0;
-			_standing = true;
-			do {
-				_pos.y = ( int )check_pos.y - adjust_y;
-				check_pos.y = _pos.y;
-			} while ( _past->isExistance( check_pos ) && adjust_y > 0.01 );
-		}
+
+	Vector check_pos = _pos + _vec;
+	check_pos.y -= add_y;
+	if ( _past->isExistance( check_pos ) ) {
+		_vec.y = 0.0;
+		_standing = true;
+		do {
+			_pos.y = ( int )check_pos.y - adjust_y;
+			check_pos.y = _pos.y;
+		} while ( _past->isExistance( check_pos ) && adjust_y > 0.01 );
 	}
 
 	if ( _vec.getLength( ) > MAX_SPEED ) {
