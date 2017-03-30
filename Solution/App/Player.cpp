@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "Application.h"
+#include "Future.h"
 #include "Past.h"
 #include "device.h"
 
@@ -15,12 +16,15 @@ static const int HAMMER_PATTERN_NUM = 8;
 static const int HAMMER_COUNT = HAMMER_PATTERN_NUM * WAIT_ANIM_TIME;
 static const double JUMP_POW = 1.0;
 static const double HEIGHT = 5.0;
+static const int MAX_HIT = 3;
 
-Player::Player( PastPtr past ) :
+Player::Player( PastPtr past, FuturePtr future ) :
 _pos( START_POS ),
 _action( ACTION_STANDING ),
 _past( past ),
-_pattern( 0 ) {
+_future( future ),
+_pattern( 0 ),
+_hammer_count( 0 ) {
 	DrawerPtr drawer = Drawer::getTask( );
 	drawer->loadGraph( GRAPH_CHARACTER, "character.png" );
 }
@@ -53,9 +57,9 @@ void Player::actOnStanding( ) {
 	DevicePtr device = Device::getTask( );
 	char device_x = device->getDirX( );
 	_vec.x = device_x / 50;
-	if ( device_x < 0 ) {
+	if ( device_x != 0 ) {
+		_hammer_count = 0;
 	}
-	move( );
 	_pattern = 8;
 
 	if ( !isStanding( ) ) {
@@ -67,7 +71,10 @@ void Player::actOnStanding( ) {
 	}
 	if ( device->getPush( ) & BUTTON_C ) {
 		_vec.y -= JUMP_POW;
+		_hammer_count = 0;
 	}
+
+	move( );
 }
 
 void Player::actOnFloating( ) {
@@ -90,6 +97,11 @@ void Player::actOnHammer( ) {
 	_pattern = 24 + _action_count / ( HAMMER_COUNT / HAMMER_PATTERN_NUM );
 	if ( _action_count > HAMMER_COUNT ) {
 		_pattern = 8;
+		_hammer_count++;
+		if ( _hammer_count >= MAX_HIT ) {
+			_future->change( );
+			_hammer_count = 0;
+		}
 		changeAction( ACTION_STANDING );
 	}
 }

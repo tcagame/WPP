@@ -3,10 +3,11 @@
 #include "define.h"
 
 PTR( Past );
+PTR( Future );
 
 class Player {
 public:
-	Player( PastPtr past );
+	Player( PastPtr past, FuturePtr future );
 	virtual ~Player( );
 public:
 	void update( );
@@ -32,7 +33,9 @@ private:
 	Vector _vec;
 	ACTION _action;
 	PastPtr _past;
+	FuturePtr _future;
 	int _pattern;
 	int _action_count;
+	int _hammer_count;
 	bool _standing;
 };
