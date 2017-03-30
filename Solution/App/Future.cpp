@@ -1,6 +1,7 @@
 #include "Drawer.h"
 #include "Future.h"
 #include "Item.h"
+#include "Past.h"
 #include "define.h"
 
 const double ROT_SPEED = 0.025;
@@ -8,6 +9,10 @@ const int SHEET_NUM = 6;
 
 const char DATA[ SHEET_NUM ][ ORIGINAL_NUM * ORIGINAL_NUM + 1 ] = {
 {//0
+"                                                                                                    "
+"                                                                                                    "
+"                                                                                                    "
+"                                                                                                    "
 "                                                                                                    "
 "                                                                                                    "
 "                                                                                                    "
@@ -68,10 +73,6 @@ const char DATA[ SHEET_NUM ][ ORIGINAL_NUM * ORIGINAL_NUM + 1 ] = {
 "                                                                                                    "
 "                                                                                                    "
 "                                                                                                    "
-"                                                                                                    "
-"                                                                                                    "
-"                                                                                                    "
-"         **************************************************************                             "
 "                                                                                                    "
 "                                                                                                    "
 "                                                                                                    "
@@ -627,13 +628,14 @@ const char DATA[ SHEET_NUM ][ ORIGINAL_NUM * ORIGINAL_NUM + 1 ] = {
 
 
 
-Future::Future( ) {
+Future::Future( PastPtr past ) :
+_past( past ),
+_rot( 0 ),
+_sheet( 0 ) {
 	DrawerPtr drawer = Drawer::getTask( );
 	drawer->createGraph( GRAPH_SCREEN_FUTURE, PAINTING_SIZE, PAINTING_SIZE );
 	drawer->loadGraph( GRAPH_FUTURE_DOT, "future_dot.png" );
 	drawer->loadGraph( GRAPH_ITEM, "item.png" );
-	_rot = 0;
-	_sheet = 0;
 	for ( int i = 0; i <  ORIGINAL_NUM * ORIGINAL_NUM; i++ ) {
 		_data[ i ] = DATA[ _sheet ][ i ];
 	}
@@ -727,6 +729,26 @@ void Future::load( ) {
 }
 
 void Future::change( ) {
+	char data[ DOT_NUM * DOT_NUM + 1 ];
+	DrawerPtr drawer = Drawer::getTask( );
+
+	for ( int i = 0; i < DOT_NUM; i++ ) {
+		for ( int j = 0; j < DOT_NUM; j++ ) {
+			//@–³‰ñ“]
+			Vector vec(
+				i - DOT_NUM / 2,
+				j - DOT_NUM / 2 );
+			Matrix mat = Matrix::makeTransformRotation( Vector( 0, 0, 1 ), _rot );
+			vec = mat.multiply( vec );
+			int xx = ( int )vec.x + ORIGINAL_NUM / 2;
+			int yy = ( int )vec.y + ORIGINAL_NUM / 2;
+			int idx = xx + yy * ORIGINAL_NUM;
+			if ( _data[ idx ] == '*' ) {
+				data[ i + j * DOT_NUM ] = '*';
+			}
+		}
+	}
+	_past->addPicture( data );
 	_sheet++;
 	for ( int i = 0; i <  ORIGINAL_NUM * ORIGINAL_NUM; i++ ) {
 		_data[ i ] = DATA[ _sheet ][ i ];
@@ -734,8 +756,9 @@ void Future::change( ) {
 	load( );
 }
 
-void Future::erase( Vector pos, int radius ) {
+void Future::erase( Vector pos, double radius ) {
 	pos.y -= radius;
+	radius += 1;
 	//ŠG‰æ‰ñ“]Œã@pos‚ÌˆÊ’u‚Ì ”¼Œa•ªƒf[ƒ^‚ð‚¯‚·
 	//@–³‰ñ“]
 	Vector vec(
@@ -745,6 +768,30 @@ void Future::erase( Vector pos, int radius ) {
 	vec = mat.multiply( vec );
 	int xx = ( int )vec.x + ORIGINAL_NUM / 2;
 	int yy = ( int )vec.y + ORIGINAL_NUM / 2;
-	int idx = xx + yy * ORIGINAL_NUM;
-	_data[ idx ] = ' ';
+	for ( int i = 0; i < radius; i++ ) {
+		double height = (int)( sqrt( radius * radius - i * i ) );
+		for ( int j = 0; j < height; j++ ) {
+			//‰E‰º
+			int x = xx + i;
+			int y = yy + j;
+			int idx = x + y * ORIGINAL_NUM;
+			_data[ idx ] = ' ';
+
+			//‰Eã
+			y = yy - j;
+			idx = x + y * ORIGINAL_NUM;
+			_data[ idx ] = ' ';
+
+			//¶ã
+			x = xx - i;
+			idx = x + y * ORIGINAL_NUM;
+			_data[ idx ] = ' ';
+
+			//¶‰º
+			x = xx - i;
+			y = yy + j;
+			idx = x + y * ORIGINAL_NUM;
+			_data[ idx ] = ' ';
+		}
+	}
 }

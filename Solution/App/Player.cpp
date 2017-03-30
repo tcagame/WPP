@@ -9,7 +9,7 @@ static const double GRAVITY = 0.098;
 static const double MAX_SPEED = 1.0;
 static const Vector START_POS( 30, 12 );
 static const int PATTERN_NUM = 8;
-static const int WAIT_ANIM_TIME = 10;
+static const int WAIT_ANIM_TIME = 1;
 static const double HAMMER_MOVE_SPEED_RATIO = 0.3;
 static const int DEAD_LINE = DOT_NUM + 4;
 static const int HAMMER_PATTERN_NUM = 8;
@@ -56,7 +56,7 @@ void Player::update( ) {
 void Player::actOnStanding( ) {
 	DevicePtr device = Device::getTask( );
 	char device_x = device->getDirX( );
-	_vec.x = device_x / 50;
+	_vec.x = device_x / 100;
 	if ( device_x != 0 ) {
 		_hammer_count = 0;
 	}
@@ -99,8 +99,8 @@ void Player::actOnHammer( ) {
 		_pattern = 8;
 		_hammer_count++;
 		_future->erase( _pos, HEIGHT / 2 );
-		if ( _hammer_count >= MAX_HIT ) {
 			_future->change( );
+		if ( _hammer_count >= MAX_HIT ) {
 			_hammer_count = 0;
 		}
 		changeAction( ACTION_STANDING );

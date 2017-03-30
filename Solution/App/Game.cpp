@@ -21,7 +21,7 @@ Game::~Game( ) {
 void Game::initialize( ) {
 	_frame = FramePtr( new Frame );
 	_past = PastPtr( new Past );
-	_future = FuturePtr( new Future );
+	_future = FuturePtr( new Future( _past ) );
 	_player = PlayerPtr( new Player( _past, _future ) );
 }
 
