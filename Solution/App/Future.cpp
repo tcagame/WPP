@@ -2,7 +2,6 @@
 #include "Future.h"
 #include "Item.h"
 
-const int ORIGINAL_NUM = 100;
 const double ROT_SPEED = 0.05;
 const int SHEET_NUM = 6;
 
@@ -40,26 +39,26 @@ const char DATA[ SHEET_NUM ][ ORIGINAL_NUM * ORIGINAL_NUM + 1 ] = {
 "                                                                                                    "
 "                                                                                                    "
 "                                                                                                    "
-"                                                                                                    "
-"                                                                                                    "
-"                                                                                                    "
-"                                              $                                                     "
-"                                                                                                    "
-"                                                                                                    "
-"                                                                                                    "
-"                                                                                                    "
-"                                                                                                    "
-"                                                                                                    "
-"                                                                                                    "
-"                                              *                                                     "
-"                                              *                                                     "
-"                                              *                                                     "
-"                                              *                                                     "
-"                                             ***                                                    "
-"                                            *****                                                   "
-"                                          *********                                                 "
-"                                         ***********                                                "
-"                                        *************                                               "
+"                 **************                                                                     "
+"                 **************                                                                     "
+"                 **************                                                                     "
+"                 **************               $                                                     "
+"                 **************                                                                     "
+"                 **************                                                                     "
+"                 **************                                                                     "
+"                 **************                                                                     "
+"                 **************                                                                     "
+"                 **************                                                                     "
+"                 **************                                                                     "
+"                 **************               *                                                     "
+"                 **************               *                                                     "
+"                 **************               *                                                     "
+"                 **************               *                                                     "
+"                 **************              ***                                                    "
+"                 **************             *****                                                   "
+"                 **************           *********                                                 "
+"                 **************          ***********                                                "
+"                 **************         *************                                               "
 "***                                    ***** *** *****                                              "
 " ***                                   **** * * * ****                                              "
 "  ***                                  **** * * * ****                                              "
@@ -634,6 +633,9 @@ Future::Future( ) {
 	drawer->loadGraph( GRAPH_ITEM, "item.png" );
 	_rot = 0;
 	_sheet = 0;
+	for ( int i = 0; i <  ORIGINAL_NUM * ORIGINAL_NUM; i++ ) {
+		_data[ i ] = DATA[ _sheet ][ i ];
+	}
 	load( );
 }
 
@@ -666,7 +668,7 @@ void Future::update( ) {
 			int xx = ( int )vec.x + ORIGINAL_NUM / 2;
 			int yy = ( int )vec.y + ORIGINAL_NUM / 2;
 			int idx = xx + yy * ORIGINAL_NUM;
-			if ( DATA[ _sheet ][ idx ] != '*' ) {
+			if ( _data[ idx ] != '*' ) {
 				continue;
 			}
 
@@ -700,5 +702,23 @@ void Future::load( ) {
 
 void Future::change( ) {
 	_sheet++;
+	for ( int i = 0; i <  ORIGINAL_NUM * ORIGINAL_NUM; i++ ) {
+		_data[ i ] = DATA[ _sheet ][ i ];
+	}
 	load( );
+}
+
+void Future::erase( Vector pos, int radius ) {
+	pos.y -= radius;
+	//ŠG‰æ‰ñ“]Œã@pos‚ÌˆÊ’u‚Ì ”¼Œa•ªƒf[ƒ^‚ð‚¯‚·
+	//@–³‰ñ“]
+	Vector vec(
+		(int)pos.x - DOT_NUM / 2,
+		(int)pos.y - DOT_NUM / 2 );
+	Matrix mat = Matrix::makeTransformRotation( Vector( 0, 0, 1 ), _rot );
+	vec = mat.multiply( vec );
+	int xx = ( int )vec.x + ORIGINAL_NUM / 2;
+	int yy = ( int )vec.y + ORIGINAL_NUM / 2;
+	int idx = xx + yy * ORIGINAL_NUM;
+	_data[ idx ] = ' ';
 }
