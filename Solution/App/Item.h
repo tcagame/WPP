@@ -7,7 +7,7 @@ public:
 	virtual ~Item( );
 public:
 	void update( Matrix mat, int oliginal_num );
-	Vector getPos( );
+	Vector getPos( Matrix mat, int oliginal_num );
 	Vector rotetion( Matrix mat, int oliginal_num );
 private:
 	Vector _pos;

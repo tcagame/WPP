@@ -6,7 +6,7 @@
 
 const double ROT_SPEED = 0.025;
 const int SHEET_NUM = 6;
-const int ITEM_GET_RENGE = 16;
+const int ITEM_GET_RENGE = 5;
 
 const char DATA[ SHEET_NUM ][ ORIGINAL_NUM * ORIGINAL_NUM + 1 ] = {
 {//0
@@ -757,8 +757,7 @@ void Future::change( ) {
 	load( );
 }
 
-bool Future::isErase( Vector pos, double radius ) {
-	pos.y -= radius;
+void Future::erase( Vector pos, double radius ) {
 	radius += 1;
 	//ŠG‰æ‰ñ“]Œã@pos‚ÌˆÊ’u‚Ì ”¼Œa•ªƒf[ƒ^‚ð‚¯‚·
 	//@–³‰ñ“]
@@ -795,16 +794,17 @@ bool Future::isErase( Vector pos, double radius ) {
 			_data[ idx ] = ' ';
 		}
 	}
-	return true;
 }
 
 bool Future::isGetItem( Vector pos ) {
-	if ( !_item ) {
-		return false;
+	if ( _item ) {
+		Matrix mat = Matrix::makeTransformRotation( Vector( 0, 0, -1 ), _rot );
+		Vector item_pos = _item->getPos( mat, ORIGINAL_NUM );
+		Vector vec = pos - _item->getPos( mat, ORIGINAL_NUM );
+		if ( vec.getLength( ) < ITEM_GET_RENGE ) {
+			_item.reset( );
+			return true;
+		}
 	}
-
-	if ( ( _item->getPos( ) - pos ).getLength( ) <= ITEM_GET_RENGE ) {
-		_item.reset( );
-		return true;
-	}
+	return false;
 }
