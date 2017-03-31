@@ -20,8 +20,17 @@ void Item::update( Matrix mat, int oliginal_num ) {
 	int x = (int)( pos.x * DOT_SIZE - CHIP_SIZE / 2 );
 	int y = (int)( pos.y * DOT_SIZE - CHIP_SIZE / 2 );
 
+
 	DrawerPtr drawer = Drawer::getTask( );
 	Drawer::Transform trans( x, y );
 	Drawer::Sprite sprite( trans, GRAPH_ITEM );
 	drawer->drawSpriteToGraph( GRAPH_SCREEN_FUTURE, sprite );
+}
+
+Vector Item::rotetion( Matrix mat, int oliginal_num ) {
+	return _pos;//Ç±Ç±Ç©ÇÁâ¡ê£
+}
+
+Vector Item::getPos( ) {
+	return _pos;
 }
