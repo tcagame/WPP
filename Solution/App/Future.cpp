@@ -6,7 +6,7 @@
 
 const double ROT_SPEED = 0.025;
 const int SHEET_NUM = 6;
-const int ITEM_GET_RENGE = 16;
+const int ITEM_GET_RENGE = 5;
 
 const char DATA[ SHEET_NUM ][ ORIGINAL_NUM * ORIGINAL_NUM + 1 ] = {
 {//0
@@ -632,10 +632,11 @@ const char DATA[ SHEET_NUM ][ ORIGINAL_NUM * ORIGINAL_NUM + 1 ] = {
 Future::Future( PastPtr past ) :
 _past( past ),
 _rot( 0 ),
-_sheet( 0 ){
+_sheet( 1 ){
 	DrawerPtr drawer = Drawer::getTask( );
 	drawer->createGraph( GRAPH_SCREEN_FUTURE, PAINTING_SIZE, PAINTING_SIZE );
-	drawer->loadGraph( GRAPH_FUTURE_DOT, "future_dot.png" );
+	drawer->loadGraph( GRAPH_FUTURE_DOT_1, "future_dot_1.png" );
+	drawer->loadGraph( GRAPH_FUTURE_DOT_2, "future_dot_2.png" );
 	drawer->loadGraph( GRAPH_ITEM, "item.png" );
 	for ( int i = 0; i <  ORIGINAL_NUM * ORIGINAL_NUM; i++ ) {
 		_data[ i ] = DATA[ _sheet ][ i ];
@@ -652,7 +653,7 @@ GRAPH Future::getGraph( ) const {
 }
 
 void Future::update( ) {
-	_rot += ROT_SPEED;
+	//_rot += ROT_SPEED;
 	Matrix mat = Matrix::makeTransformRotation( Vector( 0, 0, 1 ), _rot );
 
 	char tmp[ ORIGINAL_NUM * ORIGINAL_NUM ] = { 0 };
@@ -688,23 +689,31 @@ void Future::update( ) {
 	if ( _sheet >= SHEET_NUM ) {
 		return;
 	}
-	for ( int i = 0; i < DOT_NUM; i++ ) {
-		for ( int j = 0; j < DOT_NUM; j++ ) {
+	for ( int i = 0; i < DOT_NUM; i += 2 ) {
+		for ( int j = 0; j < DOT_NUM; j += 2 ) {
+
 			int xx = i + ( ORIGINAL_NUM - DOT_NUM ) / 2;
 			int yy = j + ( ORIGINAL_NUM - DOT_NUM ) / 2;
+			GRAPH graph = GRAPH_FUTURE_DOT_1;
+			int idx = yy * ORIGINAL_NUM + xx;
+			if ( tmp[ idx ] == '*' ) {
+				graph = GRAPH_FUTURE_DOT_2;
+			}
+
 			unsigned char flg = 0;
-			for ( int k = 0; k < 4; k++ ) {
-				int idx = ( xx + k % 2 ) + ( yy + k / 2 ) * ORIGINAL_NUM;
-				if ( tmp[ idx ] != '*' ) {
-					continue;
-				}
-				flg |= 1 << k;
+
+			const int OFFSET_X[ 8 ] = { -1,  1, -1, 1,  0,  0, -1,  1 };
+			const int OFFSET_Y[ 8 ] = { -1, -1,  1, 1, -1,  1,  0,  0 };
+
+			for ( int k = 0; k < 8; k++ ) {
+				int idx = ( xx + OFFSET_X[ k ] ) + ( yy + OFFSET_Y[ k ] ) * ORIGINAL_NUM;
+				flg |= ( tmp[ idx ] == '*' ) << k;
 			}
 			
-			int x = i * DOT_SIZE;
-			int y = j * DOT_SIZE;
-			Drawer::Transform trans( x, y, ( flg % 4 ) * DOT_SIZE, ( flg / 4 ) * DOT_SIZE, DOT_SIZE, DOT_SIZE );
-			Drawer::Sprite sprite( trans, GRAPH_FUTURE_DOT );
+			int x = i * DOT_SIZE - DOT_SIZE / 4;
+			int y = j * DOT_SIZE - DOT_SIZE / 4;
+			Drawer::Transform trans( x, y, ( flg % 16 ) * DOT_SIZE * 2, ( flg / 16 ) * DOT_SIZE * 2, DOT_SIZE * 2, DOT_SIZE * 2 );
+			Drawer::Sprite sprite( trans, graph );
 			drawer->drawSpriteToGraph( GRAPH_SCREEN_FUTURE, sprite );
 		}
 	}
@@ -757,8 +766,7 @@ void Future::change( ) {
 	load( );
 }
 
-bool Future::isErase( Vector pos, double radius ) {
-	pos.y -= radius;
+void Future::erase( Vector pos, double radius ) {
 	radius += 1;
 	//ŠG‰æ‰ñ“]Œã@pos‚ÌˆÊ’u‚Ì ”¼Œa•ªƒf[ƒ^‚ð‚¯‚·
 	//@–³‰ñ“]
@@ -795,16 +803,17 @@ bool Future::isErase( Vector pos, double radius ) {
 			_data[ idx ] = ' ';
 		}
 	}
-	return true;
 }
 
 bool Future::isGetItem( Vector pos ) {
-	if ( !_item ) {
-		return false;
+	if ( _item ) {
+		Matrix mat = Matrix::makeTransformRotation( Vector( 0, 0, -1 ), _rot );
+		Vector item_pos = _item->getPos( mat, ORIGINAL_NUM );
+		Vector vec = pos - _item->getPos( mat, ORIGINAL_NUM );
+		if ( vec.getLength( ) < ITEM_GET_RENGE ) {
+			_item.reset( );
+			return true;
+		}
 	}
-
-	if ( ( _item->getPos( ) - pos ).getLength( ) <= ITEM_GET_RENGE ) {
-		_item.reset( );
-		return true;
-	}
+	return false;
 }

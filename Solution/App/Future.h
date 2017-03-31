@@ -16,7 +16,7 @@ public:
 	GRAPH getGraph( ) const;
 	void update( );
 	void change( );
-	bool isErase( Vector pos, double radius );
+	void erase( Vector pos, double radius );
 	bool isGetItem( Vector pos );
 private:
 	void load( );
