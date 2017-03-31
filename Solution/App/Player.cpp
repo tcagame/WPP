@@ -130,7 +130,6 @@ void Player::move( ) {
 		_vec.y = 0.0;
 		_standing = true;
 		do {
-			//‚Q‰ñ–ÚˆÈ~‚Ìadjust‚Ì’l‚ª‚¨‚©‚µ‚¢
 			_pos.y = ( int )check_pos.y - adjust_y;
 			check_pos.y = _pos.y - add_y;
 		} while ( _past->isExistance( check_pos ) && adjust_y > 0.01 );
