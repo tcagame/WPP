@@ -3,6 +3,7 @@
 
 PTR( Item );
 PTR( Past );
+PTR( Player );
 
 const int ORIGINAL_NUM = 100;
 
@@ -15,7 +16,8 @@ public:
 	GRAPH getGraph( ) const;
 	void update( );
 	void change( );
-	void erase( Vector pos, double radius ); 
+	bool isErase( Vector pos, double radius );
+	bool isGetItem( Vector pos );
 private:
 	void load( );
 private:

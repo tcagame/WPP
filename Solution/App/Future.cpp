@@ -6,6 +6,7 @@
 
 const double ROT_SPEED = 0.025;
 const int SHEET_NUM = 6;
+const int ITEM_GET_RENGE = 16;
 
 const char DATA[ SHEET_NUM ][ ORIGINAL_NUM * ORIGINAL_NUM + 1 ] = {
 {//0
@@ -631,7 +632,7 @@ const char DATA[ SHEET_NUM ][ ORIGINAL_NUM * ORIGINAL_NUM + 1 ] = {
 Future::Future( PastPtr past ) :
 _past( past ),
 _rot( 0 ),
-_sheet( 0 ) {
+_sheet( 0 ){
 	DrawerPtr drawer = Drawer::getTask( );
 	drawer->createGraph( GRAPH_SCREEN_FUTURE, PAINTING_SIZE, PAINTING_SIZE );
 	drawer->loadGraph( GRAPH_FUTURE_DOT, "future_dot.png" );
@@ -756,7 +757,7 @@ void Future::change( ) {
 	load( );
 }
 
-void Future::erase( Vector pos, double radius ) {
+bool Future::isErase( Vector pos, double radius ) {
 	pos.y -= radius;
 	radius += 1;
 	//ŠG‰æ‰ñ“]Œã@pos‚ÌˆÊ’u‚Ì ”¼Œa•ªƒf[ƒ^‚ð‚¯‚·
@@ -793,5 +794,17 @@ void Future::erase( Vector pos, double radius ) {
 			idx = x + y * ORIGINAL_NUM;
 			_data[ idx ] = ' ';
 		}
+	}
+	return true;
+}
+
+bool Future::isGetItem( Vector pos ) {
+	if ( !_item ) {
+		return false;
+	}
+
+	if ( ( _item->getPos( ) - pos ).getLength( ) <= ITEM_GET_RENGE ) {
+		_item.reset( );
+		return true;
 	}
 }
