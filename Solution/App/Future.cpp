@@ -654,6 +654,7 @@ GRAPH Future::getGraph( ) const {
 
 void Future::update( ) {
 	//_rot += ROT_SPEED;
+	//_rot = PI / 2;
 	Matrix mat = Matrix::makeTransformRotation( Vector( 0, 0, 1 ), _rot );
 
 	char tmp[ ORIGINAL_NUM * ORIGINAL_NUM ] = { 0 };
